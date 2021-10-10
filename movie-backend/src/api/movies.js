@@ -10,6 +10,9 @@ router.get("/", async (request, response, next) => {
     if (Array.isArray(request.query.genre)) {
       throw new ParamsNotAllowedError("Only one genre allowed")
     }
+    if (request.query.genre) {
+      apm.setLabel("genre", request.query.genre.toLowerCase())
+    }
     const movies = await db.fetchMovie(request.query);
     return response.json(movies)
   } catch (err) {
