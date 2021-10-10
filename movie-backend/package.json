@@ -1,0 +1,22 @@
+{
+  "dependencies": {
+    "elastic-apm-node": "^3.21.1",
+    "express": "^4.17.1",
+    "knex": "^0.95.11",
+    "mysql": "^2.18.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.13"
+  },
+  "name": "movie-backend",
+  "version": "0.1.0",
+  "description": "Demo backend movie app instrumented with Elastic APM.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npm run server",
+    "start": "node ./src/index.js",
+    "server": "nodemon ./src/index.js"
+  },
+  "author": "Silvia Mitter",
+  "license": "Apache 2.0"
+}
