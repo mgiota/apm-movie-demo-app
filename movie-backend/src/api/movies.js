@@ -5,10 +5,15 @@ const { query } = require("express");
 const apm = require('elastic-apm-node')
 
 router.get("/", async (request, response, next) => {
+  apm.setTransactionName("GET /movies")
   try {
     // only allow one genre to be requested
     if (Array.isArray(request.query.genre)) {
       throw new ParamsNotAllowedError("Only one genre allowed")
+    }
+    // fake a server side error for demo purposes
+    if (request.query.genre && request.query.genre === "fail") {
+      throw `Server temporarily not available`
     }
     if (request.query.genre) {
       apm.setLabel("genre", request.query.genre.toLowerCase())
