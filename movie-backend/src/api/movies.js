@@ -2,6 +2,7 @@ const db = require("../db");
 const router = require("express").Router();
 const url = require('url')
 const { query } = require("express");
+const apm = require('elastic-apm-node')
 
 router.get("/", async (request, response, next) => {
   try {
@@ -13,6 +14,7 @@ router.get("/", async (request, response, next) => {
     return response.json(movies)
   } catch (err) {
     if (err instanceof db.MovieNotFoundError) {
+      apm.captureError(err)
       return response.json([])
     }
     next(err)
