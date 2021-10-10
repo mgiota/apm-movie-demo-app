@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { withTransaction } from '@elastic/apm-rum-react'
 import Director from './Director';
 import Genre from './Genre';
 import Movie from './Movie';
@@ -19,4 +20,4 @@ function MovieList() {
   );
 }
 
-export default MovieList;
+export default withTransaction('MovieList', "component")(MovieList);

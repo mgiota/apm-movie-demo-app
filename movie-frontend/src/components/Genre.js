@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-
+import { withTransaction } from '@elastic/apm-rum-react'
+import { apm } from '@elastic/apm-rum';
 
 function Genre({ onChange }) {
   const [error, setError] = useState(null);
@@ -17,6 +18,7 @@ function Genre({ onChange }) {
         setIsLoaded(true)
       },
         (error) => {
+          apm.captureError(error)
           setError(error)
           setIsLoaded(true)
         });
@@ -49,4 +51,4 @@ function Genre({ onChange }) {
   }
 }
 
-export default Genre;
+export default withTransaction('Genre', "component")(Genre);
