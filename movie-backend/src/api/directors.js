@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const db = require("../db");
 
-router.get("/", async (request, response) => {
+router.get("/", async (request, response, next) => {
   try {
     const directors = await db.fetchDirector();
     return response.json(directors.map(d => d.name))
