@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { withTransaction } from '@elastic/apm-rum-react'
 
 function Movie({ genre, directors }) {
   const [movies, setMovies] = useState([]);
@@ -55,4 +56,4 @@ function Movie({ genre, directors }) {
   )
 }
 
-export default Movie;
+export default withTransaction('Movie', "component")(Movie);

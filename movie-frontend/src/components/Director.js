@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
+import { withTransaction } from '@elastic/apm-rum-react'
+import { apm } from '@elastic/apm-rum';
 
 function Director({ onChange }) {
   const [error, setError] = useState(null);
@@ -19,6 +21,7 @@ function Director({ onChange }) {
         setIsLoaded(true)
       },
         (error) => {
+          apm.captureError(error)
           setError(error)
           setIsLoaded(true)
         });
@@ -50,4 +53,4 @@ function Director({ onChange }) {
   }
 }
 
-export default Director;
+export default withTransaction('Director', "component")(Director);
