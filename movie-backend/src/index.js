@@ -16,6 +16,10 @@ const express = require('express')
 const app = express()
 const port = 3001
 
+const logger = require('./utils/logger').logger;
+const errorLogger = require('./utils/logger').errorLogger;
+app.use(logger);
+
 // showcase example app with automatic instrumentation
 const genreRouter = require("./api/genres");
 const directorsRouter = require("./api/directors");
@@ -27,6 +31,14 @@ app.use("/movies", moviesRouter);
 
 // first connect the apm middleware
 app.use(apm.middleware.connect())
+
+app.use('/error', function(req, res, next) {
+  // here we cause an error in the pipeline so we see express-winston in action.
+  return next(new Error("This is an error and it should be logged to the console"));
+});
+
+//express-winston errorLogger makes sense AFTER the router.
+app.use(errorLogger);
 
 // then register any other middleware error handlers
 function errorHandler(err, req, res, next) {
@@ -41,5 +53,5 @@ function errorHandler(err, req, res, next) {
 app.use(errorHandler)
 
 app.listen(port, () => {
-  console.log(`App listening at http://localhost:${port}`)
+  console.log(`App listening at http://localhost:${port}`);
 })
