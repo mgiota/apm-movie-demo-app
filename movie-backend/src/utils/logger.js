@@ -1,32 +1,44 @@
 const winston = require('winston');
-const expressWinston = require('express-winston');
 const ecsFormat = require('@elastic/ecs-winston-format');
 
-const logger = expressWinston.logger({
-  level: 'debug',
-  format: ecsFormat({ convertReqRes: true }),
+const logger = winston.createLogger({
+  level: 'info',
   transports: [
     new winston.transports.File({
       filename: 'logs/logs.json',
       level: 'debug'
     })
   ],
-  meta: true, // optional: control whether you want to log the meta data about the request (default to true)
-  msg: "HTTP {{req.method}} {{req.url}}", // optional: customize the default logging message. E.g. "{{res.statusCode}} {{req.method}} {{res.responseTime}}ms {{req.url}}"
-  expressFormat: true, // Use the default Express/morgan request formatting. Enabling this will override any msg if true. Will only output colors with colorize set to true
-  colorize: false, // Color the text and status code, using the Express/morgan color palette (text: gray, status: default green, 3XX cyan, 4XX yellow, 5XX red).
-  ignoreRoute: function (req, res) { return false; } // optional: allows to skip some log messages based on request and/or response
+  format: ecsFormat({ convertReqRes: true }),
 });
 
-const errorLogger = expressWinston.errorLogger({
-  transports: [
-    new winston.transports.File({
-      filename: 'logs/logs.json',
-      level: 'debug'
-    })
-  ],
-  format: ecsFormat({ convertReqRes: true }),
-});
+// Simple express middleware for request logging.
+function expressRequestLogger (opts) {
+  const logger = opts.logger
+
+  return function (req, res, next) {
+    function onResDone (err) {
+      this.removeListener('finish', onResDone)
+      this.removeListener('error', onResDone)
+      logger.info(`handled ${req.method} ${req.baseUrl}`, { req, res, err })
+    }
+    res.on('finish', onResDone)
+    res.on('error', onResDone)
+    next()
+  }
+}
+
+// Simple express middleware for error logging.
+function expressErrorLogger (opts) {
+  const logger = opts.logger
+
+  return function (err, req, _res, next) {
+    // TODO: error formatting `convertErr`
+    logger.info(`error handling ${req.method} ${req.path}`, { err })
+    next(err)
+  }
+}
 
 module.exports.logger = logger;
-module.exports.errorLogger = errorLogger;
+module.exports.expressRequestLogger = expressRequestLogger;
+module.exports.expressErrorLogger = expressErrorLogger;
